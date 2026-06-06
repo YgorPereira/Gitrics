@@ -1,0 +1,6 @@
+[project]
+name = "gitrics-server"
+version = "0.1.0"
+description = "A server for Gitrics, a tool for analyzing Git repositories."
+requires-python = ">=3.12"
+dependencies = []
