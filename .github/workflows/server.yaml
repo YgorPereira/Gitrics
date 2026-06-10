@@ -1,0 +1,70 @@
+name: Server CI pipeline
+
+on: 
+  push:
+    paths:
+      - 'server/**'
+
+jobs:
+ test:
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+
+    - name: Install Python
+      run: uv python install 3.12.13
+
+    - name: Sync dependencies
+      run: uv sync
+
+    - name: Run tests
+      run: uv pytest
+
+  black:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12.13
+
+      - name: Sync dependencies
+        run: uv sync
+
+      - name: Run black to check code formatting
+        run:  uv run black --check .
+
+  mypy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install Python
+        run: uv python install 3.12.13
+
+      - name: Sync dependencies
+        run: uv sync
+
+      - name: Run mypy for static type checking
+        run:  uv run mypy .
