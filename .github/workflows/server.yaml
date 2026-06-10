@@ -1,70 +1,61 @@
-name: Server CI pipeline
+name: Server CI Pipeline
 
-on: 
+on:
   push:
     paths:
-      - 'server/**'
+      - "server/**"
 
 jobs:
- test:
-  runs-on: ubuntu-latest
-
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
-    - name: Setup uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        enable-cache: true
-
-    - name: Install Python
-      run: uv python install 3.12.13
-
-    - name: Sync dependencies
-      run: uv sync
-
-    - name: Run tests
-      run: uv pytest
-
   black:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    defaults:
+      run:
+        working-directory: server
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
 
-      - name: Install Python
-        run: uv python install 3.12.13
+      - run: uv sync
 
-      - name: Sync dependencies
-        run: uv sync
-
-      - name: Run black to check code formatting
-        run:  uv run black --check .
+      - run: uv run black --check .
 
   mypy:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    defaults:
+      run:
+        working-directory: server
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
 
-      - name: Install Python
-        run: uv python install 3.12.13
+      - run: uv sync
 
-      - name: Sync dependencies
-        run: uv sync
+      - run: uv run mypy .
 
-      - name: Run mypy for static type checking
-        run:  uv run mypy .
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: server
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync
+
+      - run: uv run pytest
