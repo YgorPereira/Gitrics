@@ -1,0 +1,63 @@
+name: Node.js CI
+
+on:
+  push:
+    - "client/**"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+        # node-version: [18.x, 20.x, 22.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - run: npm ci
+    - run: npm run build 
+
+  # test:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+
+  #   strategy:
+  #     matrix:
+  #       node-version: [22.x]
+  #       # node-version: [18.x, 20.x, 22.x]
+
+  #   steps:
+  #   - uses: actions/checkout@v4
+  #   - uses: actions/setup-node@v4
+  #     with:
+  #       node-version: ${{ matrix.node-version }}
+  #       cache: 'npm'
+
+  #   - run: npm ci
+  #   - run: npm run test
+
+  lint:
+    needs: test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+        # node-version: [18.x, 20.x, 22.x]
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - run: npm ci
+    - run: npm lint
