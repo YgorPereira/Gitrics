@@ -11,7 +11,7 @@ app = FastAPI(
     title=settings.APP_NAME,
     description=settings.APP_DESCRIPTION,
     version=settings.APP_VERSION,
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 
