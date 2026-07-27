@@ -1,4 +1,6 @@
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from collections.abc import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from loguru import logger
 
 from app.core import settings
@@ -10,7 +12,7 @@ engine = create_async_engine(
 
 SessionFactory = async_sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
 
-async def get_db():
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with SessionFactory() as db:
         try:
             yield db
