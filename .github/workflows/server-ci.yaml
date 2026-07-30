@@ -22,7 +22,7 @@ jobs:
 
       - run: uv sync
 
-      - run: uv run black --check .
+      - run: uv run python -m black --check .
 
   mypy:
     runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
 
       - run: uv sync
 
-      - run: uv run mypy .
+      - run: uv run python -m mypy .
 
   test:
     runs-on: ubuntu-latest
@@ -58,4 +58,4 @@ jobs:
 
       - run: uv sync
 
-      - run: uv run pytest -m unit
+      - run: uv run python -m pytest -m unit
