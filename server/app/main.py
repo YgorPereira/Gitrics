@@ -5,6 +5,8 @@ from app.core import settings
 from app.core import lifespan
 from app.core.logging import setup_logging
 
+from app.modules.auth.routes import auth_router
+
 setup_logging()
 
 app = FastAPI(
@@ -13,6 +15,8 @@ app = FastAPI(
     version=settings.APP_VERSION,
     lifespan=lifespan,
 )
+
+app.include_router(auth_router)
 
 
 @app.get("/")

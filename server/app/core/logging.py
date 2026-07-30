@@ -1,18 +1,22 @@
 # app/core/logging.py
 import logging
 import sys
+from types import FrameType
 from loguru import logger
 
 
 class InterceptHandler(logging.Handler):
 
     def emit(self, record: logging.LogRecord) -> None:
+        level: str | int
+
         try:
             level = logger.level(record.levelname).name
         except ValueError:
             level = record.levelno
 
-        frame, depth = sys._getframe(6), 6
+        frame: FrameType | None  = sys._getframe(6)
+        depth = 6
         while frame and frame.f_code.co_filename == logging.__file__:
             frame = frame.f_back
             depth += 1

@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import SessionFactory
 
 
-# Postgresql Database dependency 
+# Postgresql Database dependency
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with SessionFactory() as db:
         try:
