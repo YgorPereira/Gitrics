@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     # Gihtub secrets and callback uri (from .env)
     GITHUB_CLIENT_ID: str = ""
-
+    GITHUB_CLIENT_SECRET: str = ""
     GITHUB_REDIRECT_URI: str = ""
 
     # JWT secret key (from .env)
