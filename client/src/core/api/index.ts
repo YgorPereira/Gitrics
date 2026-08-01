@@ -1,0 +1,1 @@
+export { GITRICS_API } from "@/core/api/gitricsApiSetup";
