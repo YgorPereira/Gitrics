@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     GITHUB_REDIRECT_URI: str = ""
 
     # JWT secret key (from .env)
-    # SECRET: str
+    JWT_SECRET_KEY: str = ""
 
     # Debug boolean from develop enviroment
     DEBUG: bool = False

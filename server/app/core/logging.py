@@ -39,6 +39,11 @@ def setup_logging():
         "<level>{message}</level>",
     )
 
+    logger.add(
+        sys.stdout,
+        level="DEBUG",
+    )
+
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
 
     for name in ("uvicorn", "uvicorn.access", "uvicorn.error", "fastapi"):
