@@ -169,7 +169,7 @@ async def test_get_user_info_should_raise_http_status_error_on_failure(
 def test_create_access_token_should_return_valid_jwt(auth_service: AuthService):
     user_id = 12345
 
-    token = auth_service.create_access_token(user_id)
+    token = auth_service.create_access_jwt_token(user_id)
 
     assert isinstance(token, str)
 
@@ -183,7 +183,7 @@ def test_create_access_token_should_set_expiration_in_the_future(
 ):
     user_id = 12345
 
-    token = auth_service.create_access_token(user_id)
+    token = auth_service.create_access_jwt_token(user_id)
     decoded = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
 
     exp_timestamp = decoded["exp"]
@@ -197,7 +197,7 @@ def test_create_access_token_should_raise_error_for_invalid_signature(
     auth_service: AuthService,
 ):
     user_id = 12345
-    token = auth_service.create_access_token(user_id)
+    token = auth_service.create_access_jwt_token(user_id)
 
     with pytest.raises(jwt.InvalidSignatureError):
         jwt.decode(token, "wrong_secret_key", algorithms=["HS256"])
@@ -230,7 +230,7 @@ async def test_callback_should_return_jwt_when_state_is_valid_and_flow_succeeds(
     cast(MagicMock, auth_service.validate_state).assert_called_once_with("fake_state", "fake_state")
     cast(AsyncMock, auth_service.exchange_code_for_token).assert_called_once_with("fake_code")
     cast(AsyncMock, auth_service.get_user_info).assert_called_once_with("fake_github_token")
-    cast(MagicMock, auth_service.create_access_token).assert_called_once_with(12345)
+    cast(MagicMock, auth_service.create_access_jwt_token).assert_called_once_with(12345)
 
 
 @pytest.mark.unit()

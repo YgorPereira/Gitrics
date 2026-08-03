@@ -5,6 +5,18 @@ on:
     paths:
       - "server/**"
 
+env:
+  GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+  GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+  GITHUB_REDIRECT_URI: ${{ secrets.GITHUB_REDIRECT_URI }}
+  JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+  PSGRE_USER: ${{ secrets.PSGRE_USER }}
+  PSGRE_PASSWORD: ${{ secrets.PSGRE_PASSWORD }}
+  PSGRE_HOST: ${{ secrets.PSGRE_HOST }}
+  PSGRE_PORT: ${{ secrets.PSGRE_PORT }}
+  PSGRE_DB: ${{ secrets.PSGRE_DB }}
+  DEBUG: "False"
+
 jobs:
   black:
     runs-on: ubuntu-latest

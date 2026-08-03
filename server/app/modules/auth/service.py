@@ -27,8 +27,8 @@ class AuthService:
         scopes = ["read:user", "read:project"]
 
         params = {
-            "client_id": settings.GITHUB_CLIENT_ID,
-            "redirect_uri": settings.GITHUB_REDIRECT_URI,
+            "client_id": settings.GH_CLIENT_ID,
+            "redirect_uri": settings.GH_REDIRECT_URI,
             "scope": " ".join(scopes),
             "state": state,
         }
@@ -67,7 +67,7 @@ class AuthService:
                 detail="Failed to retrieve user information from GitHub.",
             )
 
-        access_token_jwt = self.create_access_token(user_id)
+        access_token_jwt = self.create_access_jwt_token(user_id)
 
         return access_token_jwt
 
@@ -92,10 +92,10 @@ class AuthService:
                     "Accept": "application/json",
                 },
                 data={
-                    "client_id": settings.GITHUB_CLIENT_ID,
-                    "client_secret": settings.GITHUB_CLIENT_SECRET,
+                    "client_id": settings.GH_CLIENT_ID,
+                    "client_secret": settings.GH_CLIENT_SECRET,
                     "code": code,
-                    "redirect_uri": settings.GITHUB_REDIRECT_URI,
+                    "redirect_uri": settings.GH_REDIRECT_URI,
                 },
             )
 
@@ -127,7 +127,7 @@ class AuthService:
         """
         return state_from_cookie is not None and state_from_cookie == state
 
-    def create_access_token(self, user_id: int) -> str:
+    def create_access_jwt_token(self, user_id: int) -> str:
         """
         Create an access token for the authenticated user.
 
