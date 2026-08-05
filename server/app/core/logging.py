@@ -1,9 +1,23 @@
 # app/core/logging.py
+from enum import Enum
 import logging
 import sys
 from types import FrameType
 from loguru import logger
 
+from server.app.core import settings
+
+LOG_FORMAT = (
+    "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
+    "<level>{level: <8}</level> | "
+    "<cyan>{extra[log_type]} | </cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
+    "<level>{message}</level>"
+)
+
+class LogType(str, Enum):
+    APP = "app"
+    DB_TRANSACTION  = "db_transaction"
+    AUTH = "auth"
 
 class InterceptHandler(logging.Handler):
 
@@ -29,19 +43,18 @@ class InterceptHandler(logging.Handler):
 def setup_logging():
     logger.remove()
 
-    logger.add(
-        sys.stdout,
-        level="INFO",
-        colorize=True,
-        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "
-        "<level>{level: <8}</level> | "
-        "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
-        "<level>{message}</level>",
+    logger.configure(
+        extra={
+            "log_type": LogType.APP,
+        }
     )
 
     logger.add(
         sys.stdout,
-        level="DEBUG",
+        level="DEBUG" if settings.DEBUG else "INFO",
+        diagnose=settings.DEBUG,
+        colorize=True,
+        format=LOG_FORMAT
     )
 
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
