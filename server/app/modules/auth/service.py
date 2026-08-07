@@ -39,7 +39,9 @@ class AuthService:
 
         return authorization_url, state
 
-    async def callback(self, code: str, state: str, state_from_cookie: str | None) -> str:
+    async def callback(
+        self, code: str, state: str, state_from_cookie: str | None
+    ) -> str:
         """
         Handle the callback from GitHub's OAuth.
 

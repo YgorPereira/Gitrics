@@ -14,10 +14,12 @@ LOG_FORMAT = (
     "<level>{message}</level>"
 )
 
+
 class LogType(str, Enum):
     APP = "app"
-    DB_TRANSACTION  = "db_transaction"
+    DB_TRANSACTION = "db_transaction"
     AUTH = "auth"
+
 
 class InterceptHandler(logging.Handler):
 
@@ -54,7 +56,7 @@ def setup_logging():
         level="DEBUG" if settings.DEBUG else "INFO",
         diagnose=settings.DEBUG,
         colorize=True,
-        format=LOG_FORMAT
+        format=LOG_FORMAT,
     )
 
     logging.basicConfig(handlers=[InterceptHandler()], level=0, force=True)
