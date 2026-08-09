@@ -6,9 +6,9 @@ on:
       - "server/**"
 
 env:
-  GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
-  GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
-  GITHUB_REDIRECT_URI: ${{ secrets.GITHUB_REDIRECT_URI }}
+  GH_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
+  GH_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+  GH_REDIRECT_URI: ${{ secrets.GITHUB_REDIRECT_URI }}
   JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
   PSGRE_USER: ${{ secrets.PSGRE_USER }}
   PSGRE_PASSWORD: ${{ secrets.PSGRE_PASSWORD }}
@@ -54,7 +54,7 @@ jobs:
 
       - run: uv run python -m mypy .
 
-  test:
+  test-unit:
     runs-on: ubuntu-latest
 
     defaults:
@@ -71,3 +71,23 @@ jobs:
       - run: uv sync
 
       - run: uv run python -m pytest -m unit
+
+  test-integration:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: server
+
+    env: 
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync
+
+      - run: uv run python -m pytest -m integration
