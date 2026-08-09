@@ -165,14 +165,14 @@ class TestAuthService:
     def test_create_access_token_should_return_valid_jwt(
         self, auth_service: AuthService
     ):
-        user_id = "12345"
+        user_id = 12345
 
         token = auth_service.create_access_jwt_token(user_id)
 
         assert isinstance(token, str)
 
         decoded = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
-        assert decoded["sub"] == user_id
+        assert decoded["sub"] == str(user_id)
 
     @pytest.mark.unit()
     def test_create_access_token_should_set_expiration_in_the_future(

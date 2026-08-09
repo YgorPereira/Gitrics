@@ -40,3 +40,7 @@ asyncio_mode = "auto"
 [tool.pytest_env]
 testpaths = ["tests"]
 env_files = [".env.test"]
+[tool.mypy]
+cache_dir = ".mypy_cache"
+warn_unused_ignores = false
+ignore_missing_imports = true

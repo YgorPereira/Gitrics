@@ -1,3 +1,6 @@
+from typing import Any, Callable, cast
+from uuid import uuid4
+
 import pytest
 
 from app.entities import UserEntity
@@ -10,8 +13,8 @@ def user_repository(db_session) -> UserRepository:
 
 
 @pytest.fixture
-def make_user_entity() -> UserEntity:
-    def _make(**overrides) -> UserEntity:
+def make_user_entity() -> Callable[..., UserEntity]:
+    def _make(**overrides: Any) -> UserEntity:
         data = dict(
             id=None,
             github_id="123456",
@@ -21,7 +24,7 @@ def make_user_entity() -> UserEntity:
             created_at="2023-01-01T00:00:00Z",
         )
         data.update(overrides)
-        return UserEntity(**data)
+        return UserEntity(**cast(dict[str, Any], data))
 
     return _make
 
@@ -60,6 +63,16 @@ class TestUserRepository:
         assert isinstance(founded_user, UserEntity)
 
     @pytest.mark.integration
+    async def test_get_user_by_id_should_return_none_for_inexistent_user(
+        self, user_repository
+    ):
+        random_id = uuid4()
+
+        founded_user = await user_repository.get_user_by_id(random_id)
+
+        assert founded_user is None
+
+    @pytest.mark.integration
     async def test_get_user_by_github_id_should_return_existent_user(
         self, user_repository, make_user_entity
     ):
@@ -78,6 +91,14 @@ class TestUserRepository:
         assert founded_user.access_token == created_user.access_token
         assert founded_user.created_at == created_user.created_at
         assert isinstance(founded_user, UserEntity)
+
+    @pytest.mark.integration
+    async def test_get_user_by_github_id_should_return_none_for_inexistent_user(
+        self, user_repository
+    ):
+        founded_user = await user_repository.get_user_by_github_id("123")
+
+        assert founded_user is None
 
     @pytest.mark.integration
     async def test_update_user_should_update_successfully(
@@ -110,6 +131,16 @@ class TestUserRepository:
         assert updated_user.created_at == created_user.created_at
 
     @pytest.mark.integration
+    async def test_update_user_return_none_for_inexistent_user(
+        self, user_repository, make_user_entity
+    ):
+        fake_user = make_user_entity(id=uuid4())
+
+        founded_user = await user_repository.update_user(fake_user)
+
+        assert founded_user is None
+
+    @pytest.mark.integration
     async def test_delete_user_should_delete_successfully(
         self, user_repository, make_user_entity
     ):
@@ -121,3 +152,11 @@ class TestUserRepository:
 
         assert delete_result is True
         assert founded_user is None
+
+    @pytest.mark.integration
+    async def test_delete_user_false_for_inexistent_user(self, user_repository):
+        random_id = uuid4()
+
+        delete_result = await user_repository.delete_user(random_id)
+
+        assert delete_result is False

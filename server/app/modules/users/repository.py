@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import Depends
 from sqlalchemy import select
 
@@ -21,7 +22,7 @@ class UserRepository:
         await self.db_session.refresh(user_model)
         return UserMapper.to_entity(user_model)
 
-    async def get_user_by_id(self, user_id: int) -> UserEntity | None:
+    async def get_user_by_id(self, user_id: UUID) -> UserEntity | None:
         result = await self.db_session.get(UserModel, user_id)
 
         if result is None:
@@ -29,7 +30,7 @@ class UserRepository:
 
         return UserMapper.to_entity(result)
 
-    async def get_user_by_github_id(self, github_id: int) -> UserEntity | None:
+    async def get_user_by_github_id(self, github_id: str) -> UserEntity | None:
         result = await self.db_session.execute(
             select(UserModel).where(UserModel.github_id == github_id)
         )
@@ -57,7 +58,7 @@ class UserRepository:
 
         return UserMapper.to_entity(user_model)
 
-    async def delete_user(self, user_id: int) -> bool:
+    async def delete_user(self, user_id: UUID) -> bool:
         user_model = await self.db_session.get(UserModel, user_id)
 
         if user_model is None:

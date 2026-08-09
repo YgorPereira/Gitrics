@@ -1,12 +1,16 @@
+from uuid import UUID
+from typing import Optional
+
+
 class UserEntity:
     def __init__(
         self,
-        id: int,
+        id: UUID,
         username: str,
-        avatar_url: str = None,
-        github_id: str = None,
-        access_token: str = None,
-        created_at: str = None,
+        avatar_url: Optional[str] = None,
+        github_id: Optional[str] = None,
+        access_token: Optional[str] = None,
+        created_at: Optional[str] = None,
     ):
         self.id = id
         self.username = username
