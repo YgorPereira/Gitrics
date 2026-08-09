@@ -78,9 +78,7 @@ jobs:
     defaults:
       run:
         working-directory: server
-
-    env: 
-
+  
     steps:
       - uses: actions/checkout@v4
 
