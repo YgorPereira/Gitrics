@@ -1,4 +1,3 @@
-from typing import Any, Callable, cast
 from uuid import uuid4
 
 import pytest
@@ -10,23 +9,6 @@ from app.modules.users.repository import UserRepository
 @pytest.fixture
 def user_repository(db_session) -> UserRepository:
     return UserRepository(db_session=db_session)
-
-
-@pytest.fixture
-def make_user_entity() -> Callable[..., UserEntity]:
-    def _make(**overrides: Any) -> UserEntity:
-        data = dict(
-            id=None,
-            github_id="123456",
-            username="testuser",
-            avatar_url="https://example.com/avatar.png",
-            access_token="testaccesstoken",
-            created_at="2023-01-01T00:00:00Z",
-        )
-        data.update(overrides)
-        return UserEntity(**cast(dict[str, Any], data))
-
-    return _make
 
 
 class TestUserRepository:

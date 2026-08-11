@@ -1,4 +1,5 @@
 import os
+from typing import Any, Callable, cast
 
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
@@ -9,6 +10,7 @@ from pytest_postgresql.janitor import DatabaseJanitor
 from app.core.database import AsyncSessionFactory, Base
 from app.models import *
 from app.core.dependencies import get_db
+from app.entities.user_entity import UserEntity
 
 
 @pytest.fixture()
@@ -50,3 +52,20 @@ async def db_session(test_db_engine):
     async for session in get_db():
         yield session
         await session.rollback()
+
+
+@pytest.fixture
+def make_user_entity() -> Callable[..., UserEntity]:
+    def _make(**overrides: Any) -> UserEntity:
+        data = dict(
+            id=None,
+            github_id="123456",
+            username="testuser",
+            avatar_url="https://example.com/avatar.png",
+            access_token="testaccesstoken",
+            created_at="2023-01-01T00:00:00Z",
+        )
+        data.update(overrides)
+        return UserEntity(**cast(dict[str, Any], data))
+
+    return _make
