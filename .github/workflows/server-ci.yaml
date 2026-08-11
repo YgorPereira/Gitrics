@@ -6,15 +6,10 @@ on:
       - "server/**"
 
 env:
-  GH_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
-  GH_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
-  GH_REDIRECT_URI: ${{ secrets.GITHUB_REDIRECT_URI }}
+  GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+  GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+  GH_REDIRECT_URI: ${{ secrets.GH_REDIRECT_URI }}
   JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-  PSGRE_USER: ${{ secrets.PSGRE_USER }}
-  PSGRE_PASSWORD: ${{ secrets.PSGRE_PASSWORD }}
-  PSGRE_HOST: ${{ secrets.PSGRE_HOST }}
-  PSGRE_PORT: ${{ secrets.PSGRE_PORT }}
-  PSGRE_DB: ${{ secrets.PSGRE_DB }}
   DEBUG: "False"
 
 jobs:
@@ -75,6 +70,25 @@ jobs:
   test-integration:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ${{ secrets.PSGRE_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.PSGRE_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.PSGRE_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      PSGRE_HOST: localhost
+      PSGRE_PORT: 5432
+    
     defaults:
       run:
         working-directory: server
