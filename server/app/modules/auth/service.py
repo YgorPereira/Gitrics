@@ -71,6 +71,8 @@ class AuthService:
 
         access_token_jwt = self.create_access_jwt_token(user_id)
 
+        print("to force pipeline exec")
+
         return access_token_jwt
 
     async def exchange_code_for_token(self, code: str) -> str:
