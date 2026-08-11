@@ -26,7 +26,7 @@ def temp_postgre_db():
         port=os.environ.get("PSGRE_PORT", 5432),
         dbname=os.environ.get("PSGRE_DB", "gitrics"),
         password=os.environ.get("PSGRE_PASSWORD", "secret_password"),
-        version=15,
+        version=16,
     ) as janitor:
         yield f"postgresql+asyncpg://{janitor.user}:{janitor.password}@{janitor.host}:{janitor.port}/{janitor.dbname}"
 
