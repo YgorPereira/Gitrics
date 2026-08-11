@@ -2,14 +2,34 @@ from datetime import timedelta, datetime, timezone
 from secrets import token_urlsafe
 from urllib.parse import urlencode
 
-from fastapi import HTTPException, Request, Response
+from fastapi import Depends, HTTPException, Request, Response
 import httpx
 import jwt
 
 from app.core import settings
+from app.modules.users.repository import UserRepository
 
 
 class AuthService:
+    """
+    Service responsible for handling GitHub OAuth authentication flow.
+
+    Coordinates the authorization URL generation, state validation (CSRF
+    protection), token exchange with GitHub, and issuance of the
+    application's own JWT access token upon successful authentication.
+    """
+
+    def __init__(self, user_repository: UserRepository):
+        """
+        Initialize the service with a user repository.
+
+        Args:
+            user_repository (UserRepository): The repository used to
+            look up or persist user data associated with the
+            authenticated GitHub account.
+        """
+        self.user_repository = user_repository
+
     def build_authorization_url_and_state(self) -> tuple[str, str]:
         """
         Build the GitHub OAuth authorization URL and generate a state parameter.
@@ -61,17 +81,15 @@ class AuthService:
 
         user = await self.get_user_info(github_access_token)
 
-        user_id = user.get("id")
+        github_user_id = user.get("id")
 
-        if not user_id:
+        if not github_user_id:
             raise HTTPException(
                 status_code=400,
                 detail="Failed to retrieve user information from GitHub.",
             )
 
-        access_token_jwt = self.create_access_jwt_token(user_id)
-
-        print("to force pipeline exec")
+        access_token_jwt = self.create_access_jwt_token(github_user_id)
 
         return access_token_jwt
 

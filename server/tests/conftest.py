@@ -2,7 +2,7 @@ import os
 from typing import Any, Callable, cast
 
 import pytest_asyncio
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine
 
 import pytest
 from pytest_postgresql.janitor import DatabaseJanitor
@@ -12,7 +12,7 @@ from app.models import *
 from app.core.dependencies import get_db
 from app.entities.user_entity import UserEntity
 
-
+# Fake database to test
 @pytest.fixture()
 def temp_postgre_db():
     """
@@ -45,7 +45,6 @@ async def test_db_engine(temp_postgre_db):
 
     await engine.dispose()
 
-
 @pytest_asyncio.fixture()
 async def db_session(test_db_engine):
     AsyncSessionFactory.configure(bind=test_db_engine)
@@ -54,6 +53,7 @@ async def db_session(test_db_engine):
         await session.rollback()
 
 
+# User test support functions
 @pytest.fixture
 def make_user_entity() -> Callable[..., UserEntity]:
     def _make(**overrides: Any) -> UserEntity:
