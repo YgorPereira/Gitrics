@@ -86,6 +86,9 @@ jobs:
           --health-retries 5
 
     env:
+      PSGRE_USER: ${{ secrets.PSGRE_USER }}
+      PSGRE_PASSWORD: ${{ secrets.PSGRE_PASSWORD }}
+      PSGRE_DB: ${{ secrets.PSGRE_DB }}
       PSGRE_HOST: localhost
       PSGRE_PORT: 5432
     
