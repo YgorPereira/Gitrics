@@ -10,6 +10,7 @@ env:
   GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
   GH_REDIRECT_URI: ${{ secrets.GH_REDIRECT_URI }}
   JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+  FERNET_SECRET_KEY: ${{ secrets.FERNET_SECRET_KEY }}
   DEBUG: "False"
 
 jobs:
