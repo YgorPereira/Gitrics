@@ -10,6 +10,7 @@ from app.entities.user_entity import UserEntity
 from app.modules.users.exceptions import UserNotFoundException
 from app.core.crypto import decrypt_token, encrypt_token
 from app.core import settings
+from app.core.types import GithubUserDict
 
 
 @pytest.fixture()
@@ -138,6 +139,7 @@ class TestUserServices:
         random_uuid = uuid4()
         existent_user = make_user_entity(id=random_uuid)
         github_user_dict = dict(
+            github_id="fake_github_id",
             username="ygor_username",
             avatar_url="https://ygor_example.com/avatar.png",
         )
@@ -152,7 +154,6 @@ class TestUserServices:
         repository_mock.update_user.return_value = updated_user
 
         result = await user_service.get_and_update_or_create_user(
-            github_id="fake_github_id",
             github_user=github_user_dict,
             access_token="fake_access_token",
         )
@@ -177,7 +178,8 @@ class TestUserServices:
         secret_key_mock = Fernet.generate_key().decode()
         monkeypatch.setattr(settings, "FERNET_SECRET_KEY", secret_key_mock)
 
-        github_dict_mock = dict(
+        github_dict_mock: GithubUserDict = dict(
+            github_id="fake_github_id",
             username="crash_bandicoot",
             avatar_url="https://raposa_maluca.com/avatar.png",
         )
@@ -196,7 +198,6 @@ class TestUserServices:
         repository_mock.create_user.return_value = new_created_user
 
         result = await user_service.get_and_update_or_create_user(
-            github_id="fake_github_id",
             github_user=github_dict_mock,
             access_token=fake_access_token,
         )

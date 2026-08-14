@@ -5,6 +5,7 @@ from app.entities.user_entity import UserEntity
 from app.modules.users.exceptions import UserNotFoundException
 from app.modules.users.repository import UserRepository
 from app.core.crypto import encrypt_token
+from app.core.types import GithubUserDict
 
 
 class UserService:
@@ -101,7 +102,7 @@ class UserService:
         return updated_user
 
     async def get_and_update_or_create_user(
-        self, github_id: str, github_user: dict, access_token: str
+        self, github_user: GithubUserDict, access_token: str
     ) -> UserEntity:
         """
         ...
@@ -109,15 +110,17 @@ class UserService:
         encrypted_token = encrypt_token(access_token)
 
         try:
-            user = await self.get_user_by_github_id(github_id=github_id)
-            user.username = github_user.get("username")  # type: ignore
+            user = await self.get_user_by_github_id(
+                github_id=github_user.get("github_id")
+            )
+            user.username = github_user.get("username")
             user.avatar_url = github_user.get("avatar_url")
             user.access_token = encrypted_token
             return await self.update_user(user=user)
         except UserNotFoundException:
             new_user = UserEntity(
-                github_id=github_id,
-                username=github_user.get("username"),  # type: ignore
+                github_id=github_user.get("github_id"),
+                username=github_user.get("username"),
                 avatar_url=github_user.get("avatar_url"),
                 access_token=encrypted_token,
             )
