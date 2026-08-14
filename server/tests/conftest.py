@@ -12,6 +12,7 @@ from app.models import *
 from app.core.dependencies import get_db
 from app.entities.user_entity import UserEntity
 
+
 # Fake database to test
 @pytest.fixture()
 def temp_postgre_db():
@@ -44,6 +45,7 @@ async def test_db_engine(temp_postgre_db):
         await conn.run_sync(Base.metadata.drop_all)
 
     await engine.dispose()
+
 
 @pytest_asyncio.fixture()
 async def db_session(test_db_engine):

@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     # JWT secret key (from .env)
     JWT_SECRET_KEY: str = ""
 
+    # FERNET secret key (from .env)
+    FERNET_SECRET_KEY: str = ""
+
     # Debug boolean from develop enviroment
     DEBUG: bool = False
 

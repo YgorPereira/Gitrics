@@ -19,16 +19,16 @@ class AuthService:
     application's own JWT access token upon successful authentication.
     """
 
-    def __init__(self, user_repository: UserRepository):
-        """
-        Initialize the service with a user repository.
+    # def __init__(self, user_repository: UserRepository):
+    # """
+    # Initialize the service with a user repository.
 
-        Args:
-            user_repository (UserRepository): The repository used to
-            look up or persist user data associated with the
-            authenticated GitHub account.
-        """
-        self.user_repository = user_repository
+    # Args:
+    #     user_repository (UserRepository): The repository used to
+    #     look up or persist user data associated with the
+    #     authenticated GitHub account.
+    # """
+    # self.user_repository = user_repository
 
     def build_authorization_url_and_state(self) -> tuple[str, str]:
         """

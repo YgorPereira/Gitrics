@@ -5,8 +5,8 @@ from typing import Optional
 class UserEntity:
     def __init__(
         self,
-        id: UUID,
         username: str,
+        id: Optional[UUID] = None,
         avatar_url: Optional[str] = None,
         github_id: Optional[str] = None,
         access_token: Optional[str] = None,

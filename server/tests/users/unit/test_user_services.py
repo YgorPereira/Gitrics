@@ -1,11 +1,15 @@
 from unittest.mock import AsyncMock
 from uuid import uuid4
+from cryptography.fernet import Fernet
+
 
 import pytest
 
 from app.modules.users.services import UserService
 from app.entities.user_entity import UserEntity
 from app.modules.users.exceptions import UserNotFoundException
+from app.core.crypto import decrypt_token, encrypt_token
+from app.core import settings
 
 
 @pytest.fixture()
@@ -122,3 +126,90 @@ class TestUserServices:
             await user_service.update_user(user_mock)
 
         repository_mock.update_user.assert_called_once_with(user=user_mock)
+
+    @pytest.mark.unit
+    async def test_get_and_update_or_create_user_should_update_existent_user(
+        self, user_service, repository_mock, make_user_entity, monkeypatch
+    ):
+
+        secret_key_mock = Fernet.generate_key().decode()
+        monkeypatch.setattr(settings, "FERNET_SECRET_KEY", secret_key_mock)
+
+        random_uuid = uuid4()
+        existent_user = make_user_entity(id=random_uuid)
+        github_user_dict = dict(
+            username="ygor_username",
+            avatar_url="https://ygor_example.com/avatar.png",
+        )
+        updated_user = make_user_entity(
+            id=random_uuid,
+            username=github_user_dict.get("username"),
+            avatar_url=github_user_dict.get("avatar_url"),
+            access_token=encrypt_token("fake_access_token"),
+        )
+
+        repository_mock.get_user_by_github_id.return_value = existent_user
+        repository_mock.update_user.return_value = updated_user
+
+        result = await user_service.get_and_update_or_create_user(
+            github_id="fake_github_id",
+            github_user=github_user_dict,
+            access_token="fake_access_token",
+        )
+
+        called_user = repository_mock.update_user.call_args.kwargs["user"]
+
+        repository_mock.get_user_by_github_id.assert_called_once_with(
+            github_id="fake_github_id"
+        )
+
+        assert result.id == random_uuid
+        assert result.username == updated_user.username
+        assert result.avatar_url == updated_user.avatar_url
+        assert decrypt_token(result.access_token) == decrypt_token(
+            called_user.access_token
+        )
+
+    @pytest.mark.unit
+    async def test_get_and_update_or_create_user_should_create_for_inexistente_user(
+        self, user_service, repository_mock, make_user_entity, monkeypatch
+    ):
+        secret_key_mock = Fernet.generate_key().decode()
+        monkeypatch.setattr(settings, "FERNET_SECRET_KEY", secret_key_mock)
+
+        github_dict_mock = dict(
+            username="crash_bandicoot",
+            avatar_url="https://raposa_maluca.com/avatar.png",
+        )
+
+        fake_access_token = "hello_test"
+
+        random_uuid = uuid4()
+        new_created_user = make_user_entity(
+            id=random_uuid,
+            username=github_dict_mock.get("username"),
+            avatar_url=github_dict_mock.get("avatar_url"),
+            access_token=encrypt_token(fake_access_token),
+        )
+
+        repository_mock.get_user_by_github_id.return_value = None
+        repository_mock.create_user.return_value = new_created_user
+
+        result = await user_service.get_and_update_or_create_user(
+            github_id="fake_github_id",
+            github_user=github_dict_mock,
+            access_token=fake_access_token,
+        )
+
+        called_user = repository_mock.create_user.call_args.kwargs["user"]
+
+        repository_mock.get_user_by_github_id.assert_called_once_with(
+            github_id="fake_github_id"
+        )
+
+        assert result.id == random_uuid
+        assert result.username == new_created_user.username
+        assert result.avatar_url == new_created_user.avatar_url
+        assert decrypt_token(result.access_token) == decrypt_token(
+            called_user.access_token
+        )
