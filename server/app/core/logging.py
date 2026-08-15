@@ -5,7 +5,7 @@ import sys
 from types import FrameType
 from loguru import logger
 
-from server.app.core import settings
+from app.core import settings
 
 LOG_FORMAT = (
     "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | "

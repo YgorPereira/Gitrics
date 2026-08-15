@@ -2,13 +2,14 @@ from fastapi import Request, Response
 from fastapi.responses import RedirectResponse
 
 from app.modules.auth.service import AuthService
+from app.core import settings
 
 
 class AuthController:
     def __init__(self, auth_service: AuthService):
         self.auth_service = auth_service
 
-    async def github_login(self, response: Response) -> RedirectResponse:
+    async def github_login(self) -> RedirectResponse:
         """
         Redirect the user to GitHub's OAuth authorization page.
 
@@ -23,7 +24,7 @@ class AuthController:
 
         redirect_response = RedirectResponse(url=authorization_url)
 
-        response.set_cookie(
+        redirect_response.set_cookie(
             key="oauth_state",
             value=state,
             httponly=True,
@@ -33,7 +34,9 @@ class AuthController:
 
         return redirect_response
 
-    async def github_callback(self, code: str, state: str, request: Request) -> str:
+    async def github_callback(
+        self, code: str, state: str, request: Request
+    ) -> RedirectResponse:
         """
         Handle the callback from GitHub's OAuth.
 
@@ -46,5 +49,18 @@ class AuthController:
             o_auth_state (str): The OAuth state parameter.
         """
         state_from_cookie = request.cookies.get("oauth_state")
+        jwt = await self.auth_service.callback(code, state, state_from_cookie)
 
-        return await self.auth_service.callback(code, state, state_from_cookie)
+        redirect_response = RedirectResponse(url=settings.CLIENT_REDIRECT_URL)
+
+        redirect_response.set_cookie(
+            key="access_jwt",
+            value=jwt,
+            httponly=True,
+            samesite="lax",
+            max_age=60 * 60 * 12,
+        )
+
+        redirect_response.delete_cookie("oauth_state")
+
+        return redirect_response

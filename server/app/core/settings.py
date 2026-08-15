@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     # FERNET secret key (from .env)
     FERNET_SECRET_KEY: str = ""
 
+    # CLIENT_REDIRECT_URL to redirect user after login(from .env)
+    CLIENT_REDIRECT_URL: str = ""
+
     # Debug boolean from develop enviroment
     DEBUG: bool = False
 

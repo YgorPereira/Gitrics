@@ -5,7 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import AsyncSessionFactory
 from app.modules.users.repository import UserRepository
-from app.modules.users.services import UserService
+from app.modules.users.service import UserService
+from app.modules.auth.service import AuthService
+from app.modules.auth.controller import AuthController
 
 
 # Postgresql Database dependency
@@ -20,9 +22,18 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 
 # User dependencies
-async def get_user_repository(db_session=Depends(get_db)):
+def get_user_repository(db_session=Depends(get_db)):
     return UserRepository(db_session)
 
 
-async def get_user_service(repository=Depends(get_user_repository)):
+def get_user_service(repository=Depends(get_user_repository)):
     return UserService(repository)
+
+
+# Auth depencies
+def get_auth_service(user_service=Depends(get_user_service)):
+    return AuthService(user_service)
+
+
+def get_auth_controller(auth_service=Depends(get_auth_service)):
+    return AuthController(auth_service=auth_service)

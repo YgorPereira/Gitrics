@@ -5,22 +5,12 @@ from cryptography.fernet import Fernet
 
 import pytest
 
-from app.modules.users.services import UserService
+
 from app.entities.user_entity import UserEntity
 from app.modules.users.exceptions import UserNotFoundException
 from app.core.crypto import decrypt_token, encrypt_token
 from app.core import settings
 from app.core.types import GithubUserDict
-
-
-@pytest.fixture()
-def repository_mock():
-    return AsyncMock()
-
-
-@pytest.fixture()
-def user_service(repository_mock):
-    return UserService(repository_mock)
 
 
 class TestUserServices:

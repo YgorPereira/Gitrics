@@ -2,12 +2,13 @@ from datetime import timedelta, datetime, timezone
 from secrets import token_urlsafe
 from urllib.parse import urlencode
 
-from fastapi import Depends, HTTPException, Request, Response
+from fastapi import HTTPException, Request, Response
 import httpx
 import jwt
 
 from app.core import settings
-from app.modules.users.repository import UserRepository
+from app.modules.users.service import UserService
+from app.core.types import GithubUserDict
 
 
 class AuthService:
@@ -19,16 +20,16 @@ class AuthService:
     application's own JWT access token upon successful authentication.
     """
 
-    # def __init__(self, user_repository: UserRepository):
-    # """
-    # Initialize the service with a user repository.
+    def __init__(self, user_service: UserService):
+        """
+        Initialize the service with a user repository.
 
-    # Args:
-    #     user_repository (UserRepository): The repository used to
-    #     look up or persist user data associated with the
-    #     authenticated GitHub account.
-    # """
-    # self.user_repository = user_repository
+        Args:
+            user_service (UserService): The service used to
+            look up or persist user data associated with the
+            authenticated GitHub account.
+        """
+        self.user_service = user_service
 
     def build_authorization_url_and_state(self) -> tuple[str, str]:
         """
@@ -74,26 +75,37 @@ class AuthService:
             state (str): The state parameter received from GitHub.
             state_from_cookie (str): The state parameter from the cookie.
         """
-        if not self.validate_state(state, state_from_cookie):
+        if not self._validate_state(state, state_from_cookie):
             raise HTTPException(status_code=400, detail="Invalid state parameter.")
 
-        github_access_token = await self.exchange_code_for_token(code)
+        github_access_token = await self._exchange_code_for_token(code)
 
-        user = await self.get_user_info(github_access_token)
+        user = await self._get_user_info(github_access_token)
 
-        github_user_id = user.get("id")
+        print("user", user)
+        github_id = user.get("id")
 
-        if not github_user_id:
+        if not github_id:
             raise HTTPException(
                 status_code=400,
                 detail="Failed to retrieve user information from GitHub.",
             )
 
-        access_token_jwt = self.create_access_jwt_token(github_user_id)
+        access_jwt = self._create_access_jwt(github_id)
 
-        return access_token_jwt
+        github_user_dict: GithubUserDict = dict(
+            github_id=str(github_id),
+            username=user.get("login"),
+            avatar_url=user.get("avatar_url"),
+        )
 
-    async def exchange_code_for_token(self, code: str) -> str:
+        await self.user_service.get_and_update_or_create_user(
+            github_user=github_user_dict, access_token=github_access_token
+        )
+
+        return access_jwt
+
+    async def _exchange_code_for_token(self, code: str) -> str:
         """
         Exchange the authorization code for an access token.
 
@@ -134,7 +146,7 @@ class AuthService:
 
         return access_token
 
-    def validate_state(self, state: str, state_from_cookie: str | None) -> bool:
+    def _validate_state(self, state: str, state_from_cookie: str | None) -> bool:
         """
         Validate the state parameter received from GitHub's OAuth callback.
 
@@ -149,7 +161,7 @@ class AuthService:
         """
         return state_from_cookie is not None and state_from_cookie == state
 
-    def create_access_jwt_token(self, user_id: int) -> str:
+    def _create_access_jwt(self, user_id: int) -> str:
         """
         Create an access token for the authenticated user.
 
@@ -166,7 +178,7 @@ class AuthService:
 
         return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm="HS256")
 
-    async def get_user_info(self, access_token: str) -> dict:
+    async def _get_user_info(self, access_token: str) -> dict:
         """
         Retrieve user information from GitHub using the access token.
 

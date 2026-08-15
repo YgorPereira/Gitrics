@@ -13,8 +13,8 @@ from app.core import settings
 
 
 @pytest.fixture
-def auth_service():
-    return AuthService()
+def auth_service(user_service):
+    return AuthService(user_service)
 
 
 class TestAuthService:
@@ -49,21 +49,22 @@ class TestAuthService:
     def test_validate_state_should_return_true_for_valid_state(
         self, auth_service: AuthService
     ):
-        assert auth_service.validate_state("matching_state", "matching_state") is True
+        assert auth_service._validate_state("matching_state", "matching_state") is True
 
     @pytest.mark.unit()
     def test_validate_state_should_return_false_for_invalid_state(
         self, auth_service: AuthService
     ):
         assert (
-            auth_service.validate_state("state_from_github", "different_state") is False
+            auth_service._validate_state("state_from_github", "different_state")
+            is False
         )
 
     @pytest.mark.unit()
     def test_validate_state_should_return_false_when_cookie_is_missing(
         self, auth_service: AuthService
     ):
-        assert auth_service.validate_state("any_state", "") is False
+        assert auth_service._validate_state("any_state", "") is False
 
     @pytest.mark.unit()
     async def test_exchange_code_for_token_should_return_access_token(
@@ -81,7 +82,7 @@ class TestAuthService:
         monkeypatch.setattr(httpx, "AsyncClient", lambda *args, **kwargs: mock_client)
 
         code = "fake_code"
-        access_token = await auth_service.exchange_code_for_token(code)
+        access_token = await auth_service._exchange_code_for_token(code)
 
         assert access_token == "fake_access_token"
 
@@ -104,7 +105,7 @@ class TestAuthService:
         code = "fake_code"
 
         with pytest.raises(httpx.HTTPStatusError):
-            await auth_service.exchange_code_for_token(code)
+            await auth_service._exchange_code_for_token(code)
 
     @pytest.mark.unit()
     async def test_get_user_info_should_return_user_data(
@@ -127,7 +128,7 @@ class TestAuthService:
         monkeypatch.setattr(httpx, "AsyncClient", lambda *args, **kwargs: mock_client)
 
         access_token = "fake_access_token"
-        user_info = await auth_service.get_user_info(access_token)
+        user_info = await auth_service._get_user_info(access_token)
 
         assert user_info["login"] == "ygor"
         assert user_info["id"] == 12345
@@ -159,7 +160,7 @@ class TestAuthService:
         access_token = "invalid_token"
 
         with pytest.raises(httpx.HTTPStatusError):
-            await auth_service.get_user_info(access_token)
+            await auth_service._get_user_info(access_token)
 
     @pytest.mark.unit()
     def test_create_access_token_should_return_valid_jwt(
@@ -167,7 +168,7 @@ class TestAuthService:
     ):
         user_id = 12345
 
-        token = auth_service.create_access_jwt_token(user_id)
+        token = auth_service._create_access_jwt(user_id)
 
         assert isinstance(token, str)
 
@@ -180,7 +181,7 @@ class TestAuthService:
     ):
         user_id = 12345
 
-        token = auth_service.create_access_jwt_token(user_id)
+        token = auth_service._create_access_jwt(user_id)
         decoded = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
 
         exp_timestamp = decoded["exp"]
@@ -193,7 +194,7 @@ class TestAuthService:
         self, auth_service: AuthService
     ):
         user_id = 12345
-        token = auth_service.create_access_jwt_token(user_id)
+        token = auth_service._create_access_jwt(user_id)
 
         with pytest.raises(jwt.InvalidSignatureError):
             jwt.decode(token, "wrong_secret_key", algorithms=["HS256"])
@@ -203,21 +204,21 @@ class TestAuthService:
         self, auth_service: AuthService, monkeypatch
     ):
         monkeypatch.setattr(
-            auth_service, "validate_state", MagicMock(return_value=True)
+            auth_service, "_validate_state", MagicMock(return_value=True)
         )
         monkeypatch.setattr(
             auth_service,
-            "exchange_code_for_token",
+            "_exchange_code_for_token",
             AsyncMock(return_value="fake_github_token"),
         )
         monkeypatch.setattr(
             auth_service,
-            "get_user_info",
+            "_get_user_info",
             AsyncMock(return_value={"id": 12345, "login": "ygor"}),
         )
         monkeypatch.setattr(
             auth_service,
-            "create_access_jwt_token",
+            "_create_access_jwt",
             MagicMock(return_value="fake_jwt_token"),
         )
 
@@ -226,28 +227,26 @@ class TestAuthService:
         )
 
         assert result == "fake_jwt_token"
-        cast(MagicMock, auth_service.validate_state).assert_called_once_with(
+        cast(MagicMock, auth_service._validate_state).assert_called_once_with(
             "fake_state", "fake_state"
         )
-        cast(AsyncMock, auth_service.exchange_code_for_token).assert_called_once_with(
+        cast(AsyncMock, auth_service._exchange_code_for_token).assert_called_once_with(
             "fake_code"
         )
-        cast(AsyncMock, auth_service.get_user_info).assert_called_once_with(
+        cast(AsyncMock, auth_service._get_user_info).assert_called_once_with(
             "fake_github_token"
         )
-        cast(MagicMock, auth_service.create_access_jwt_token).assert_called_once_with(
-            12345
-        )
+        cast(MagicMock, auth_service._create_access_jwt).assert_called_once_with(12345)
 
     @pytest.mark.unit()
     async def test_callback_should_raise_http_exception_when_state_is_invalid(
         self, auth_service: AuthService, monkeypatch
     ):
         monkeypatch.setattr(
-            auth_service, "validate_state", MagicMock(return_value=False)
+            auth_service, "_validate_state", MagicMock(return_value=False)
         )
         exchange_mock = AsyncMock()
-        monkeypatch.setattr(auth_service, "exchange_code_for_token", exchange_mock)
+        monkeypatch.setattr(auth_service, "_exchange_code_for_token", exchange_mock)
 
         with pytest.raises(HTTPException) as exc_info:
             await auth_service.callback(
@@ -266,18 +265,18 @@ class TestAuthService:
         self, auth_service: AuthService, monkeypatch
     ):
         monkeypatch.setattr(
-            auth_service, "validate_state", MagicMock(return_value=True)
+            auth_service, "_validate_state", MagicMock(return_value=True)
         )
         monkeypatch.setattr(
             auth_service,
-            "exchange_code_for_token",
+            "_exchange_code_for_token",
             AsyncMock(return_value="fake_github_token"),
         )
         monkeypatch.setattr(
-            auth_service, "get_user_info", AsyncMock(return_value={"login": "ygor"})
+            auth_service, "_get_user_info", AsyncMock(return_value={"login": "ygor"})
         )
         create_token_mock = MagicMock()
-        monkeypatch.setattr(auth_service, "create_access_jwt_token", create_token_mock)
+        monkeypatch.setattr(auth_service, "_create_access_jwt", create_token_mock)
 
         with pytest.raises(HTTPException) as exc_info:
             await auth_service.callback(

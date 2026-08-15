@@ -1,5 +1,7 @@
 import os
 from typing import Any, Callable, cast
+from unittest.mock import AsyncMock
+from app.modules.users.service import UserService
 
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -65,9 +67,19 @@ def make_user_entity() -> Callable[..., UserEntity]:
             username="testuser",
             avatar_url="https://example.com/avatar.png",
             access_token="testaccesstoken",
-            created_at="2023-01-01T00:00:00Z",
+            # created_at="2023-01-01T00:00:00Z",
         )
         data.update(overrides)
         return UserEntity(**cast(dict[str, Any], data))
 
     return _make
+
+
+@pytest.fixture()
+def repository_mock():
+    return AsyncMock()
+
+
+@pytest.fixture()
+def user_service(repository_mock):
+    return UserService(repository_mock)

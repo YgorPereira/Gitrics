@@ -1,4 +1,6 @@
-from sqlalchemy import String
+from datetime import datetime
+
+from sqlalchemy import String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 
@@ -13,4 +15,4 @@ class UserModel(Base, IdMixin):
     avatar_url: Mapped[str] = mapped_column(String(255), nullable=True)
     github_id: Mapped[str] = mapped_column(String(255), unique=True, nullable=True)
     access_token: Mapped[str] = mapped_column(String(255), nullable=True)
-    created_at: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
