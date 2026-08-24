@@ -5,6 +5,14 @@ on:
     paths:
       - "server/**"
 
+env:
+  GH_CLIENT_ID: ${{ secrets.GH_CLIENT_ID }}
+  GH_CLIENT_SECRET: ${{ secrets.GH_CLIENT_SECRET }}
+  GH_REDIRECT_URI: ${{ secrets.GH_REDIRECT_URI }}
+  JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+  FERNET_SECRET_KEY: ${{ secrets.FERNET_SECRET_KEY }}
+  DEBUG: "False"
+
 jobs:
   black:
     runs-on: ubuntu-latest
@@ -42,7 +50,7 @@ jobs:
 
       - run: uv run python -m mypy .
 
-  test:
+  test-unit:
     runs-on: ubuntu-latest
 
     defaults:
@@ -59,3 +67,37 @@ jobs:
       - run: uv sync
 
       - run: uv run python -m pytest -m unit
+
+  test-integration:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: ${{ secrets.PSGRE_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.PSGRE_PASSWORD }}
+        ports:
+          - 5432:5432
+  
+    env:
+      PSGRE_USER: ${{ secrets.PSGRE_USER }}
+      PSGRE_PASSWORD: ${{ secrets.PSGRE_PASSWORD }}
+      PSGRE_DB: ${{ secrets.PSGRE_DB }}
+      PSGRE_HOST: localhost
+      PSGRE_PORT: 5432
+    
+    defaults:
+      run:
+        working-directory: server
+  
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync
+
+      - run: uv run python -m pytest -m integration

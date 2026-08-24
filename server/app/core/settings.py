@@ -15,12 +15,18 @@ class Settings(BaseSettings):
     PSGRE_DB: str = "gitrics"
 
     # Gihtub secrets and callback uri (from .env)
-    GITHUB_CLIENT_ID: str = ""
-    GITHUB_CLIENT_SECRET: str = ""
-    GITHUB_REDIRECT_URI: str = ""
+    GH_CLIENT_ID: str = ""
+    GH_CLIENT_SECRET: str = ""
+    GH_REDIRECT_URI: str = ""
 
     # JWT secret key (from .env)
-    # SECRET: str
+    JWT_SECRET_KEY: str = ""
+
+    # FERNET secret key (from .env)
+    FERNET_SECRET_KEY: str = ""
+
+    # CLIENT_REDIRECT_URL to redirect user after login(from .env)
+    CLIENT_REDIRECT_URL: str = ""
 
     # Debug boolean from develop enviroment
     DEBUG: bool = False
