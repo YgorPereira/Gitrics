@@ -3,6 +3,7 @@ from typing import cast
 from unittest.mock import AsyncMock, MagicMock
 from urllib.parse import parse_qs, urlparse
 
+
 from fastapi import HTTPException
 import httpx
 import jwt
@@ -214,7 +215,13 @@ class TestAuthService:
         monkeypatch.setattr(
             auth_service,
             "_get_user_info",
-            AsyncMock(return_value={"id": 12345, "login": "ygor"}),
+            AsyncMock(
+                return_value={
+                    "id": 12345,
+                    "login": "ygor",
+                    "avatar_url": "https://avatars.githubusercontent.com/u/12345",
+                }
+            ),
         )
         monkeypatch.setattr(
             auth_service,

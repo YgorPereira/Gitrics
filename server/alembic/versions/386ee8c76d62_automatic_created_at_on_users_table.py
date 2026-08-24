@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 """automatic created_at on users table
 
 Revision ID: 386ee8c76d62

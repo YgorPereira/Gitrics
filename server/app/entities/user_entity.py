@@ -1,5 +1,6 @@
 from uuid import UUID
 from typing import Optional
+from datetime import datetime
 
 
 class UserEntity:
@@ -10,7 +11,7 @@ class UserEntity:
         avatar_url: Optional[str] = None,
         github_id: Optional[str] = None,
         access_token: Optional[str] = None,
-        created_at: Optional[str] = None,
+        created_at: Optional[datetime] = None,
     ):
         self.id = id
         self.username = username

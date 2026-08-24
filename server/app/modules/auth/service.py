@@ -82,10 +82,11 @@ class AuthService:
 
         user = await self._get_user_info(github_access_token)
 
-        print("user", user)
         github_id = user.get("id")
+        username = user.get("login")
+        avatar_url = user.get("avatar_url")
 
-        if not github_id:
+        if not github_id or not username or not avatar_url:
             raise HTTPException(
                 status_code=400,
                 detail="Failed to retrieve user information from GitHub.",
@@ -95,8 +96,8 @@ class AuthService:
 
         github_user_dict: GithubUserDict = dict(
             github_id=str(github_id),
-            username=user.get("login"),
-            avatar_url=user.get("avatar_url"),
+            username=username,
+            avatar_url=avatar_url,
         )
 
         await self.user_service.get_and_update_or_create_user(

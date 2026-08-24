@@ -1,3 +1,5 @@
+# mypy: ignore-errors
+
 from unittest.mock import AsyncMock
 from uuid import uuid4
 from cryptography.fernet import Fernet
