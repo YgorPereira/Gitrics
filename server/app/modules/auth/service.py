@@ -31,6 +31,7 @@ class AuthService:
         """
         self.user_service = user_service
 
+    # TODO: Consider mover para o módulo do github, pois é uma responsabilidade do módulo do github
     def build_authorization_url_and_state(self) -> tuple[str, str]:
         """
         Build the GitHub OAuth authorization URL and generate a state parameter.
@@ -100,12 +101,13 @@ class AuthService:
             avatar_url=avatar_url,
         )
 
-        await self.user_service.get_and_update_or_create_user(
+        await self.user_service.upsert_user(
             github_user=github_user_dict, access_token=github_access_token
         )
 
         return access_jwt
 
+    # TODO: Mover para o módulo do github, pois é uma responsabilidade do módulo do github
     async def _exchange_code_for_token(self, code: str) -> str:
         """
         Exchange the authorization code for an access token.
@@ -179,6 +181,7 @@ class AuthService:
 
         return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm="HS256")
 
+    # TODO: Mover para o módulo do github, pois é uma responsabilidade do módulo do github
     async def _get_user_info(self, access_token: str) -> dict:
         """
         Retrieve user information from GitHub using the access token.

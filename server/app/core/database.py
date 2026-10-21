@@ -17,3 +17,5 @@ class Base(DeclarativeBase):
     """Base class for all models."""
 
     pass
+
+# TODO: Considerar se tornar infra

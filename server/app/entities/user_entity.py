@@ -19,3 +19,6 @@ class UserEntity:
         self.github_id = github_id
         self.access_token = access_token
         self.created_at = created_at
+
+# TODO: Considerar mover para outro modulo, pois é uma entidade de dominio
+# TODO: Considerar separar a entidade de usuário do GitHub da entidade de usuário do sistema, pois são conceitos diferentes

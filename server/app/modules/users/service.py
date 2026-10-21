@@ -80,6 +80,7 @@ class UserService:
 
         return user
 
+    # TODO: Avaliar se é um serviço necessário, pois já temos o upsert
     async def update_user(self, user: UserEntity) -> UserEntity:
         """
         Update an existing user's data.
@@ -101,11 +102,18 @@ class UserService:
 
         return updated_user
 
-    async def get_and_update_or_create_user(
+    async def upsert_user(
         self, github_user: GithubUserDict, access_token: str
     ) -> UserEntity:
         """
-        ...
+        Upsert a user based on their GitHub information.
+
+        Args:
+            github_user (GithubUserDict): The GitHub user information.
+            access_token (str): The access token for the GitHub user.
+
+        Returns:
+            UserEntity: The upserted user entity.
         """
         encrypted_token = encrypt_token(access_token)
 

@@ -37,3 +37,5 @@ def get_auth_service(user_service=Depends(get_user_service)):
 
 def get_auth_controller(auth_service=Depends(get_auth_service)):
     return AuthController(auth_service=auth_service)
+
+# TODO: Considerar se tornar infra

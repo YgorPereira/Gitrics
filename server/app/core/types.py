@@ -5,3 +5,5 @@ class GithubUserDict(TypedDict):
     github_id: str
     username: str
     avatar_url: str
+
+# TODO: Mover para o modulo de GitHub

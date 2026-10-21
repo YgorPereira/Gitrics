@@ -121,7 +121,7 @@ class TestUserServices:
         repository_mock.update_user.assert_called_once_with(user=user_mock)
 
     @pytest.mark.unit
-    async def test_get_and_update_or_create_user_should_update_existent_user(
+    async def test_upsert_existent_user(
         self, user_service, repository_mock, make_user_entity, monkeypatch
     ):
 
@@ -145,7 +145,7 @@ class TestUserServices:
         repository_mock.get_user_by_github_id.return_value = existent_user
         repository_mock.update_user.return_value = updated_user
 
-        result = await user_service.get_and_update_or_create_user(
+        result = await user_service.upsert_user(
             github_user=github_user_dict,
             access_token="fake_access_token",
         )
@@ -164,7 +164,7 @@ class TestUserServices:
         )
 
     @pytest.mark.unit
-    async def test_get_and_update_or_create_user_should_create_for_inexistente_user(
+    async def test_upsert_new_user(
         self, user_service, repository_mock, make_user_entity, monkeypatch
     ):
         secret_key_mock = Fernet.generate_key().decode()
@@ -189,7 +189,7 @@ class TestUserServices:
         repository_mock.get_user_by_github_id.return_value = None
         repository_mock.create_user.return_value = new_created_user
 
-        result = await user_service.get_and_update_or_create_user(
+        result = await user_service.upsert_user(
             github_user=github_dict_mock,
             access_token=fake_access_token,
         )

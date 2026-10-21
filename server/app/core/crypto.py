@@ -11,3 +11,5 @@ def encrypt_token(token: str) -> str:
 
 def decrypt_token(encrypted_token: str) -> str:
     return _fernet.decrypt(encrypted_token.encode()).decode()
+
+# TODO: Considerar se tornar infra

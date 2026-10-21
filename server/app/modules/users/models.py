@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 from app.core.mixins import IdMixin
 
-
+# TODO: Considerar separar as propriedades do usuário do GitHub das propriedades do usuário do sistema, pois são conceitos diferentes (username, avatar_url, github_id, access_token)
 class UserModel(Base, IdMixin):
     __tablename__ = "users"
 
