@@ -1,11 +1,11 @@
-from app.entities.user_entity import UserEntity
+from app.domain.entities.user import User
 from app.modules.users.models import UserModel
 
 
 class UserMapper:
     @staticmethod
-    def to_entity(user_model: UserModel) -> UserEntity:
-        return UserEntity(
+    def to_entity(user_model: UserModel) -> User:
+        return User(
             id=user_model.id,
             username=user_model.username,
             avatar_url=user_model.avatar_url,
@@ -15,7 +15,7 @@ class UserMapper:
         )
 
     @staticmethod
-    def to_model(user_entity: UserEntity):
+    def to_model(user_entity: User):
 
         return UserModel(
             id=user_entity.id,

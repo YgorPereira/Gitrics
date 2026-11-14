@@ -10,9 +10,8 @@ import pytest
 from pytest_postgresql.janitor import DatabaseJanitor
 
 from app.core.database import AsyncSessionFactory, Base
-from app.models import *
 from app.core.dependencies import get_db
-from app.entities.user_entity import UserEntity
+from app.domain.entities.user import User
 
 
 # Fake database to test
@@ -59,8 +58,8 @@ async def db_session(test_db_engine):
 
 # User test support functions
 @pytest.fixture
-def make_user_entity() -> Callable[..., UserEntity]:
-    def _make(**overrides: Any) -> UserEntity:
+def make_user_entity() -> Callable[..., User]:
+    def _make(**overrides: Any) -> User:
         data = dict(
             id=None,
             github_id="123456",
@@ -70,7 +69,7 @@ def make_user_entity() -> Callable[..., UserEntity]:
             # created_at="2023-01-01T00:00:00Z",
         )
         data.update(overrides)
-        return UserEntity(**cast(dict[str, Any], data))
+        return User(**cast(dict[str, Any], data))
 
     return _make
 

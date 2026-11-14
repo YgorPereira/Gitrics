@@ -1,7 +1,7 @@
 from uuid import UUID
 
 
-from app.entities.user_entity import UserEntity
+from app.domain.entities.user import User
 from app.modules.users.exceptions import UserNotFoundException
 from app.modules.users.repository import UserRepository
 from app.core.crypto import encrypt_token
@@ -27,7 +27,7 @@ class UserService:
         """
         self.repository = repository
 
-    async def create_user(self, user: UserEntity) -> UserEntity:
+    async def create_user(self, user: User) -> User:
         """
         Create a new user.
 
@@ -39,7 +39,7 @@ class UserService:
         """
         return await self.repository.create_user(user=user)
 
-    async def get_user_by_id(self, user_id: UUID) -> UserEntity:
+    async def get_user_by_id(self, user_id: UUID) -> User:
         """
         Retrieve a user by their unique identifier.
 
@@ -59,7 +59,7 @@ class UserService:
 
         return user
 
-    async def get_user_by_github_id(self, github_id: str) -> UserEntity:
+    async def get_user_by_github_id(self, github_id: str) -> User:
         """
         Retrieve a user by their associated GitHub identifier.
 
@@ -81,7 +81,7 @@ class UserService:
         return user
 
     # TODO: Avaliar se é um serviço necessário, pois já temos o upsert
-    async def update_user(self, user: UserEntity) -> UserEntity:
+    async def update_user(self, user: User) -> User:
         """
         Update an existing user's data.
 
@@ -104,7 +104,7 @@ class UserService:
 
     async def upsert_user(
         self, github_user: GithubUserDict, access_token: str
-    ) -> UserEntity:
+    ) -> User:
         """
         Upsert a user based on their GitHub information.
 
@@ -126,7 +126,7 @@ class UserService:
             user.access_token = encrypted_token
             return await self.update_user(user=user)
         except UserNotFoundException:
-            new_user = UserEntity(
+            new_user = User(
                 github_id=github_user.get("github_id"),
                 username=github_user.get("username"),
                 avatar_url=github_user.get("avatar_url"),
