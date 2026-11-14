@@ -1,7 +1,7 @@
 from uuid import UUID
 from sqlalchemy import select
 
-from app.entities import UserEntity
+from app.domain.entities import User
 from app.modules.users.mapper import UserMapper
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +28,7 @@ class UserRepository:
         """
         self.db_session = db_session
 
-    async def create_user(self, user: UserEntity) -> UserEntity:
+    async def create_user(self, user: User) -> User:
         """
         Persist a new user in the database.
 
@@ -49,7 +49,7 @@ class UserRepository:
         await self.db_session.refresh(user_model)
         return UserMapper.to_entity(user_model)
 
-    async def get_user_by_id(self, user_id: UUID) -> UserEntity | None:
+    async def get_user_by_id(self, user_id: UUID) -> User | None:
         """
         Retrieve a user by their unique identifier.
 
@@ -67,7 +67,7 @@ class UserRepository:
 
         return UserMapper.to_entity(result)
 
-    async def get_user_by_github_id(self, github_id: str) -> UserEntity | None:
+    async def get_user_by_github_id(self, github_id: str) -> User | None:
         """
         Retrieve a user by their associated GitHub identifier.
 
@@ -88,7 +88,7 @@ class UserRepository:
 
         return UserMapper.to_entity(user_model)
 
-    async def update_user(self, user: UserEntity) -> UserEntity | None:
+    async def update_user(self, user: User) -> User | None:
         """
         Update an existing user's data.
 

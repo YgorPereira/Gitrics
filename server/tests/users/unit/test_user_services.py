@@ -8,7 +8,7 @@ from cryptography.fernet import Fernet
 import pytest
 
 
-from app.entities.user_entity import UserEntity
+from app.domain.entities.user import User
 from app.modules.users.exceptions import UserNotFoundException
 from app.core.crypto import decrypt_token, encrypt_token
 from app.core import settings
@@ -29,7 +29,7 @@ class TestUserServices:
         created_user = await user_service.create_user(new_user)
 
         repository_mock.create_user.assert_called_once_with(user=new_user)
-        assert isinstance(created_user, UserEntity)
+        assert isinstance(created_user, User)
         assert created_user.id == created_user_mock.id
 
     @pytest.mark.unit
@@ -43,7 +43,7 @@ class TestUserServices:
         user = await user_service.get_user_by_id(random_uuid)
 
         repository_mock.get_user_by_id.assert_called_once_with(user_id=random_uuid)
-        assert isinstance(user, UserEntity)
+        assert isinstance(user, User)
         assert user.id == random_uuid
 
     @pytest.mark.unit
@@ -70,7 +70,7 @@ class TestUserServices:
         repository_mock.get_user_by_github_id.assert_called_once_with(
             github_id=user_mock.github_id
         )
-        assert isinstance(user, UserEntity)
+        assert isinstance(user, User)
         assert user == user_mock
 
     @pytest.mark.unit
@@ -101,7 +101,7 @@ class TestUserServices:
         user = await user_service.update_user(user_to_update)
 
         repository_mock.update_user.assert_called_once_with(user=user_to_update)
-        assert isinstance(user, UserEntity)
+        assert isinstance(user, User)
         assert user.created_at == user_mock.created_at
         assert user.avatar_url == user_mock.avatar_url
         assert user.github_id == user_to_update.github_id

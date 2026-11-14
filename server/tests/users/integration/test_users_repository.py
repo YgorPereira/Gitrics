@@ -2,7 +2,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.entities import UserEntity
+from app.domain.entities import User
 from app.modules.users.repository import UserRepository
 
 
@@ -24,7 +24,7 @@ class TestUserRepository:
         assert created_user.avatar_url == "https://example.com/avatar.png"
         assert created_user.access_token == "testaccesstoken"
         # assert created_user.created_at == "2023-01-01T00:00:00Z"
-        assert isinstance(created_user, UserEntity)
+        assert isinstance(created_user, User)
 
     @pytest.mark.integration
     async def test_get_user_by_id_should_return_existent_user(
@@ -42,7 +42,7 @@ class TestUserRepository:
         assert founded_user.avatar_url == created_user.avatar_url
         assert founded_user.access_token == created_user.access_token
         assert founded_user.created_at == created_user.created_at
-        assert isinstance(founded_user, UserEntity)
+        assert isinstance(founded_user, User)
 
     @pytest.mark.integration
     async def test_get_user_by_id_should_return_none_for_inexistent_user(
@@ -72,7 +72,7 @@ class TestUserRepository:
         assert founded_user.avatar_url == created_user.avatar_url
         assert founded_user.access_token == created_user.access_token
         assert founded_user.created_at == created_user.created_at
-        assert isinstance(founded_user, UserEntity)
+        assert isinstance(founded_user, User)
 
     @pytest.mark.integration
     async def test_get_user_by_github_id_should_return_none_for_inexistent_user(
