@@ -102,9 +102,7 @@ class UserService:
 
         return updated_user
 
-    async def upsert_user(
-        self, github_user: GithubUserDict, access_token: str
-    ) -> User:
+    async def upsert_user(self, github_user: GithubUserDict, access_token: str) -> User:
         """
         Upsert a user based on their GitHub information.
 

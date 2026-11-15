@@ -18,4 +18,5 @@ class Base(DeclarativeBase):
 
     pass
 
+
 # TODO: Considerar se tornar infra

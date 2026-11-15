@@ -1,7 +1,9 @@
-from typing import Protocol
+from typing import Optional, Protocol
+
+from server.app.application.ports.dtos import SessionStates
 
 
 class GithubAuthenticatorPort(Protocol):
-    _url: str
+    def build_authorization_url(self, state: str) -> str: ...
 
-    def authenticate(self, code: str) ->
+    async def authenticate(self, code: str) -> str: ...
